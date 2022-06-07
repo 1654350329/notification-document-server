@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.notification.mapper.FormulationLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tree.clouds.notification.model.entity.FormulationLog">
+        <result column="log_id" property="logId"/>
+        <result column="formulation_time" property="formulationTime"/>
+        <result column="title" property="title"/>
+        <result column="year" property="year"/>
+        <result column="month" property="month"/>
+        <result column="creat_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del" property="del"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        log_id, formulation_time, title, year, month, creat_user, create_time, update_user, update_time, del
+    </sql>
+    <select id="formulationLogPage" resultType="com.tree.clouds.notification.model.entity.FormulationLog">
+        select log_id, formulation_time, title, year, month, create_user, create_time, update_user, update_time, del
+        from formulation_log
+        <where>
+            1=1
+            <if test="formulationLogPageVO.title !=null and formulationLogPageVO.title!=''">
+                and title like "%"#{formulationLogPageVO.title}"%"
+            </if>
+            <if test="formulationLogPageVO.formulationTimeStart !=null and formulationLogPageVO.formulationTimeStart!=''">
+                and formulation_time >= #{formulationLogPageVO.formulationTimeStart}
+            </if>
+            <if test="formulationLogPageVO.formulationTimeEnd !=null and formulationLogPageVO.formulationTimeEnd!=''">
+                and formulation_time &lt;= #{formulationLogPageVO.formulationTimeEnd}
+            </if>
+        </where>
+    </select>
+
+</mapper>

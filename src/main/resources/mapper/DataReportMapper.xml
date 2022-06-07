@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.notification.mapper.DataReportMapper">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        report_id, formulation_id, task, progress, examine_status, create_user, create_time, update_user, update_time, del
+    </sql>
+    <select id="dataReportPage" resultType="com.tree.clouds.notification.model.entity.DataReport">
+        SELECT a.*, c.project_name,c.number_type,c.calculation_type from data_report a
+        left join formulation_disassemble b on b.disassemble_id=a.disassemble_id
+        left join formulation_draw c on b.draw_id=c.draw_id
+        where a.region_id=#{regionId}
+        <if test="formulationDrawPageVO.year !=null and formulationDrawPageVO.year !=0">
+            and a.year=#{formulationDrawPageVO.year}
+        </if>
+        <if test="formulationDrawPageVO.drawName !=null and formulationDrawPageVO.drawName !=''">
+            and (c.project_name like "%"#{formulationDrawPageVO.drawName}"%" or a.draw_name like
+            "%"#{formulationDrawPageVO.drawName}"%")
+        </if>
+        order by c.project_name desc,c.create_time desc
+    </select>
+
+    <select id="reportExaminePage" resultType="com.tree.clouds.notification.model.vo.ReportExamineVO">
+        SELECT DISTINCT a.disassemble_id, a.draw_name,a.task,a.year,b.* ,c.region_name from data_report a
+        LEFT JOIN month_info b on a.report_id=b.biz_Id
+        left join region c on a.region_id=c.region_id
+        where a.region_id=#{regionId} and b.examine_status>0
+        <if test="reportExaminePageVO.examineStatus !=null and reportExaminePageVO.examineStatus  lte 6">
+            and b.examine_status = #{reportExaminePageVO.examineStatus}
+        </if>
+        <if test="reportExaminePageVO.status !=null">
+            and b.status = #{reportExaminePageVO.status}
+        </if>
+
+        <if test="reportExaminePageVO.drawName !=null and reportExaminePageVO.drawName !=''">
+            and a.draw_name like "%"#{reportExaminePageVO.drawName}"%"
+        </if>
+        <if test="reportExaminePageVO.year !=null and reportExaminePageVO.year !=''">
+            and a.year = #{reportExaminePageVO.year}
+        </if>
+        <if test="reportExaminePageVO.month !=null and reportExaminePageVO.month !=''">
+            and b.month = #{reportExaminePageVO.month}
+        </if>
+    </select>
+    <select id="listByDate" resultType="com.tree.clouds.notification.model.entity.MonthInfo">
+       	select b.* from data_report a
+		LEFT JOIN month_info b on a.report_id=b.biz_id
+		where a.`year`=#{year} and b.month&lt;=#{month} and b.examine_status=3
+		ORDER BY a.region_id asc
+    </select>
+    <select id="reviewExaminePage" resultType="com.tree.clouds.notification.model.vo.ReportExamineVO">
+        SELECT DISTINCT a.disassemble_id,a.draw_name,a.task,a.year,b.* ,c.region_name from data_report a
+        LEFT JOIN month_info b on a.report_id=b.biz_Id
+        left join region c on a.region_id=c.region_id
+        where b.examine_status>1
+        <if test="reportExaminePageVO.examineStatus !=null and reportExaminePageVO.examineStatus !=''">
+            and b.examine_status = #{reportExaminePageVO.examineStatus}
+        </if>
+        <if test="reportExaminePageVO.status !=null and reportExaminePageVO.status !=''">
+            and b.status = #{reportExaminePageVO.status}
+        </if>
+
+        <if test="reportExaminePageVO.drawName !=null and reportExaminePageVO.drawName !=''">
+            and a.draw_name like "%"#{reportExaminePageVO.drawName}"%"
+        </if>
+        <if test="reportExaminePageVO.year !=null and reportExaminePageVO.year !=''">
+            and a.year = #{reportExaminePageVO.year}
+        </if>
+        <if test="reportExaminePageVO.month !=null and reportExaminePageVO.month !=''">
+            and b.month = #{reportExaminePageVO.month}
+        </if>
+        <if test="reportExaminePageVO.regionName !=null and reportExaminePageVO.regionName !=''">
+            and c.region_name like "%"#{reportExaminePageVO.regionName}"%"
+        </if>
+
+    </select>
+
+
+</mapper>

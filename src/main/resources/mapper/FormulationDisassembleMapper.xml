@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.notification.mapper.FormulationDisassembleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tree.clouds.notification.model.entity.FormulationDisassemble">
+        <id column="disassemble_id" property="disassembleId"/>
+
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del" property="del"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        disassemble_id, formulation_id, region_id, task, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11, M12, create_user, create_time, update_user, update_time, del
+    </sql>
+    <select id="disassemblePage" resultType="com.tree.clouds.notification.model.bo.FormulationDisassembleBO">
+        select a.* ,b.leader,b.project_name,b.draw_name,b.number_type,b.calculation_type from formulation_disassemble a
+        LEFT JOIN formulation_draw b on a.draw_id=b.draw_id
+        left join data_report c on c.disassemble_id=a.disassemble_id
+        where a.region_id=#{regionId} and b.status=1 and c.report_id is not null
+        <if test="formulationDrawPageVO.year !=null and formulationDrawPageVO.year !=0">
+            and b.year=#{formulationDrawPageVO.year}
+        </if>
+        <if test="formulationDrawPageVO.drawName !=null and formulationDrawPageVO.drawName !=''">
+            and b.draw_name like "%"#{formulationDrawPageVO.drawName}"%"
+        </if>
+
+    </select>
+    <select id="detailDisassemble"
+            resultType="com.tree.clouds.notification.model.entity.FormulationDisassemble">
+         select a.*,b.region_name from formulation_disassemble a
+        left join region b on a.region_id=b.region_id
+        where a.draw_id=#{drawId} order by region_id asc
+    </select>
+
+</mapper>

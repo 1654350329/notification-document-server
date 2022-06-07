@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.notification.mapper.MonthInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tree.clouds.notification.model.entity.MonthInfo">
+        <result column="month_id" property="monthId"/>
+        <result column="biz_id" property="bizId"/>
+        <result column="month" property="month"/>
+        <result column="data" property="data"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del" property="del"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        mouth_id, biz_id, month, data, create_user, create_time, update_user, update_time, del
+    </sql>
+    <update id="updateExamineStatus">
+        UPDATE month_info set examine_status =5
+        <where>
+            month_id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </update>
+    <select id="getDataByMonth" resultType="java.lang.String">
+        select data from month_info where biz_id=#{bizId} and examine_status=3
+        <if test="type==null || type == 0 ">
+            and month=#{month}
+        </if>
+        <if test="type == 1">
+            and month &lt;= #{month}
+        </if>
+
+    </select>
+    <select id="getDataSum" resultType="java.lang.Long">
+        select sum(data) from month_info where month &lt;= #{month} and biz_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

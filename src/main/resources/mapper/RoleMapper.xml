@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.notification.mapper.RoleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tree.clouds.notification.model.entity.Role">
+        <id column="role_id" property="roleId"/>
+        <result column="role_name" property="roleName"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del" property="del"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        role_id, role_name, create_user, create_time, update_user, update_time, del
+    </sql>
+    <select id="roleManagePage" resultType="com.tree.clouds.notification.model.entity.Role">
+        select * from role where 1=1
+        <if test="roleManagePageVO.roleName !=null and roleManagePageVO.roleName!=''">
+            and ROLE_NAME like "%"#{roleManagePageVO.roleName}"%"
+        </if>
+    </select>
+
+</mapper>

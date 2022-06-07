@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.notification.mapper.FormulationDrawMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tree.clouds.notification.model.entity.FormulationDraw">
+        <id column="draw_id" property="drawId"/>
+        <result column="draw_name" property="drawName"/>
+        <result column="leader" property="leader"/>
+        <result column="task" property="task"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del" property="del"/>
+    </resultMap>
+    <resultMap id="DataInfoVOMap" type="com.tree.clouds.notification.model.vo.DataInfoVO">
+        <id column="draw_id" property="drawId"/>
+        <result column="draw_name" property="drawName"/>
+        <result column="leader" property="leader"/>
+        <collection property="regionDataVOS" ofType="com.tree.clouds.notification.model.vo.RegionDataVO">
+            <result column="disassemble_Id" property="disassembleId"/>
+            <result column="region_Id" property="regionId"/>
+            <result column="region_name" property="regionName"/>
+            <result column="task" property="task"/>
+            <result column="data" property="data"/>
+        </collection>
+    </resultMap>
+
+    <select id="drawPage" resultType="com.tree.clouds.notification.model.entity.FormulationDraw">
+        select * from formulation_draw
+        where 1=1
+        <if test="formulationDrawPageVO.year !=null and formulationDrawPageVO.year !=0">
+            and year=#{formulationDrawPageVO.year}
+        </if>
+        <if test="formulationDrawPageVO.drawName !=null and formulationDrawPageVO.drawName !=''">
+            and draw_name like "%"#{formulationDrawPageVO.drawName}"%"
+        </if>
+        <if test="formulationDrawPageVO.distributeStatus !=null">
+            and distribute_status = #{formulationDrawPageVO.distributeStatus}
+        </if>
+    </select>
+    <select id="dataInfo" resultMap="DataInfoVOMap">
+        select a.draw_id,a.project_name,a.draw_name,a.leader,b.disassemble_id,d.region_id,d.region_name
+        ,b.task,a.number_type,a.calculation_type
+        from formulation_draw a
+        LEFT JOIN formulation_disassemble b on a.draw_id=b.draw_id
+        LEFT JOIN data_report c on b.disassemble_id=c.disassemble_id
+        LEFT JOIN region d on c.region_id=d.region_id
+        <where>
+            a.status=1 and a.year =#{year}
+        </where>
+        order by a.project_name asc , d.region_id asc
+
+    </select>
+    <select id="distributionCount" resultType="java.lang.Integer">
+        select count(*) from  formulation_draw a
+        left join formulation_disassemble b on a.draw_id=b.draw_id
+        where b.status=1 and a.draw_Id=#{drawId}
+    </select>
+
+</mapper>

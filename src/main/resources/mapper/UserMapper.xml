@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.notification.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tree.clouds.notification.model.entity.User">
+        <id column="user_id" property="userId"/>
+        <result column="unit" property="unit"/>
+        <result column="name" property="name"/>
+        <result column="account" property="account"/>
+        <result column="password" property="password"/>
+        <result column="status" property="status"/>
+        <result column="phone" property="phone"/>
+        <result column="region_id" property="regionId"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del" property="del"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id, unit, name, account, password, status, phone, region_id, create_user, create_time, update_user, update_time, del
+    </sql>
+    <select id="listByMenuId" resultType="com.tree.clouds.notification.model.entity.User">
+
+        select DISTINCT a.* from user a
+        LEFT JOIN user_role  b on a.USER_ID=b.USER_ID
+        LEFT JOIN role_menu c on b.ROLE_ID=c.role_id
+        where c.menu_id=#{menuId}
+    </select>
+    <select id="userManagePage" resultType="com.tree.clouds.notification.model.vo.UserManageVO">
+        select a.* from user a
+        where 1=1 and a.region_id=#{userManagePageVO.regionId} and a.del=0
+
+        <if test="userManagePageVO.account != null and userManagePageVO.account != ''">
+            and a.account like "%"#{userManagePageVO.account}"%"
+        </if>
+        <if test="userManagePageVO.userName != null and userManagePageVO.userName != ''">
+            and a.name like "%"#{userManagePageVO.userName}"%"
+        </if>
+    </select>
+    <select id="listByRoleId" resultType="com.tree.clouds.notification.model.entity.User">
+            select DISTINCT a.* from user a
+            LEFT JOIN user_role  b on a.USER_ID=b.USER_ID
+            where b.role_id=#{roleId}
+    </select>
+
+</mapper>
