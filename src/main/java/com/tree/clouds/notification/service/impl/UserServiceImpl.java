@@ -5,6 +5,7 @@ import cn.hutool.core.codec.Base64;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.tree.clouds.notification.common.Constants;
 import com.tree.clouds.notification.mapper.RegionUserMapper;
 import com.tree.clouds.notification.mapper.RoleMenuMapper;
 import com.tree.clouds.notification.mapper.UserMapper;
@@ -20,6 +21,7 @@ import com.tree.clouds.notification.service.UserRoleService;
 import com.tree.clouds.notification.service.UserService;
 import com.tree.clouds.notification.utils.BaseBusinessException;
 import com.tree.clouds.notification.utils.LoginUserUtil;
+import com.tree.clouds.notification.utils.PwdCheckUtil;
 import com.tree.clouds.notification.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -110,7 +112,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String password = bCryptPasswordEncoder.encode("888888");
 
         List<User> userManages = this.listByIds(ids);
-        userManages.forEach(userManage -> userManage.setPassword(password));
+        userManages.forEach(userManage -> {
+            userManage.setPassword(password);
+            redisUtil.hdel(Constants.ERROR_LOGIN, userManage.getAccount());
+        });
         this.updateBatchById(userManages);
     }
 
@@ -191,7 +196,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public void updatePassword(UpdatePasswordVO updatePasswordVO) {
-        String password = bCryptPasswordEncoder.encode(Base64.decodeStr(updatePasswordVO.getPassword()));
+        String decodeStr = Base64.decodeStr(updatePasswordVO.getPassword());
+        //校验密码复杂度
+        PwdCheckUtil.checkStrongPwd(decodeStr);
+        String password = bCryptPasswordEncoder.encode(decodeStr);
         User user = new User();
         user.setPassword(password);
         user.setUserId(LoginUserUtil.getUserId());

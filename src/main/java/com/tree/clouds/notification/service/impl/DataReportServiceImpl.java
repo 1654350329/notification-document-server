@@ -506,10 +506,11 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, DataRep
 
         }
         List<Integer> list = new ArrayList<>();
-        list.add(2);
+        list.add(1);
+//        int[] k={1};
         ExcelWriter excelWriter = EasyExcel.write(Constants.TMP_HOME + fileName)
                 .withTemplate(in)
-                .registerWriteHandler(new ExcelMergeStrategy(4, list, 1))
+                .registerWriteHandler(new ExcelMergeStrategy(2, list, 3))
                 .build();
         WriteSheet writeSheet = EasyExcel.writerSheet().build();
         excelWriter.fill(dates, writeSheet);

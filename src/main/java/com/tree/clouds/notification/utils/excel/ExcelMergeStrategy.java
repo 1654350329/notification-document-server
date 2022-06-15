@@ -75,16 +75,8 @@ public class ExcelMergeStrategy implements CellWriteHandler {
         //2.间隔行(eachRow)的上下两条不参加合并
         //2.1间隔行(eachRow)==0时，不设置间隔
         if (isMerge(curRowIndex)) {
-//            IntStream.range(0, mergeColumnIndex.length).anyMatch(i -> {
-//                if (curColIndex == mergeColumnIndex[i]) {
-//
-//                    return true;
-//                }
-//                return false;
-//            });
             if (mergeColumnIndex.contains(curColIndex)) {
                 mergeWithPrevRow(writeSheetHolder, cellData, cell, curRowIndex, curColIndex);
-//                    return true;
             }
 
         }
@@ -93,6 +85,7 @@ public class ExcelMergeStrategy implements CellWriteHandler {
 
     @Override
     public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List cellDataList, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
+
     }
 
     /**
@@ -111,9 +104,6 @@ public class ExcelMergeStrategy implements CellWriteHandler {
 
     private boolean isMerge(Integer curRowIndex) {
         if ((curRowIndex > mergeRowIndex) && eachRow > 0) {
-//            if ((curRowIndex - mergeRowIndex) % eachRow == 0) {
-//                return false;
-//            }
             return true;
         }
         return false;
@@ -123,14 +113,15 @@ public class ExcelMergeStrategy implements CellWriteHandler {
         //获取当前行的当前列的数据和上一行的当前列列数据，通过上一行数据是否相同进行合并
         Object curData = cellData.getType() == CellDataTypeEnum.STRING ? cellData.getStringValue() : cellData.getNumberValue();
         Row row = cell.getSheet().getRow(curRowIndex - 1);
-        if (row == null) {
-            return;
+        Object preData = null;
+        if (row != null) {
+            Cell preCell = row.getCell(curColIndex);
+            preData = preCell.getCellTypeEnum() == CellType.STRING ? preCell.getStringCellValue() :
+                    preCell.getNumericCellValue();
         }
-        Cell preCell = row.getCell(curColIndex);
-        Object preData = preCell.getCellTypeEnum() == CellType.STRING ? preCell.getStringCellValue() :
-                preCell.getNumericCellValue();
-// 比较当前行的第一列的单元格与上一行是否相同，相同合并当前单元格与上一行
-        if (Objects.equals(curData, preData)) {
+
+        // 比较当前行的第一列的单元格与上一行是否相同，相同合并当前单元格与上一行
+        if (row == null || Objects.equals(curData, preData)) {
             Sheet sheet = writeSheetHolder.getSheet();
             List<CellRangeAddress> mergeRegions = sheet.getMergedRegions();
             boolean isMerged = false;

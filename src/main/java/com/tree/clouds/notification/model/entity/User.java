@@ -52,6 +52,10 @@ public class User extends BaseEntity {
     @TableField("password")
     private String password;
 
+    @ApiModelProperty(value = "密码更新时间")
+    @TableField("PASSWORD_TIME")
+    private String passwordTime;
+
     @ApiModelProperty(value = "账号状态 0停用 1启用")
     @TableField("status")
     private Integer status;

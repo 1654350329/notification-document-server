@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -21,7 +22,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String[] URL_WHITELIST = {
 
             "/login",
-            "/logout",
             "/captcha",
             "/favicon.ico",
             "/doc.html",
@@ -51,6 +51,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     JwtLogoutSuccessHandler jwtLogoutSuccessHandler;
     @Autowired
     DecryptUsernamePasswordFilter decryptUsernamePasswordFilter;
+    @Autowired
+    CustomizeLogoutHandler customizeLogoutHandler;
 
     @Bean
     JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
@@ -75,10 +77,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/logout")
+                .addLogoutHandler(customizeLogoutHandler)
                 .logoutSuccessHandler(jwtLogoutSuccessHandler)
+                .and()
+                .addFilterBefore(jwtAuthenticationFilter(), LogoutFilter.class)
 
                 // 禁用session
-                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 

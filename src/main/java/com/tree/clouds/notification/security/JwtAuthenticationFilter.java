@@ -20,7 +20,6 @@ import java.io.IOException;
 
 public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
-    // 定义一个线程域，存放登录用户
     @Autowired
     private JwtUtils jwtUtils;
 
@@ -50,11 +49,12 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
         if (jwtUtils.isTokenExpired(claim)) {
             throw new JwtException("token已过期");
         }
-        String userId = claim.getSubject();
+
+        String account = claim.getSubject();
         // 获取用户的权限等信息
-        User userManage = userService.getById(userId);
+        User userManage = userService.getUserByAccount(account);
         UsernamePasswordAuthenticationToken token
-                = new UsernamePasswordAuthenticationToken(userManage.getUserId(), userManage, userDetailService.getUserAuthority(userManage.getUserId()));
+                = new UsernamePasswordAuthenticationToken(userManage.getName(), userManage, userDetailService.getUserAuthority(userManage.getUserId()));
 
         SecurityContextHolder.getContext().setAuthentication(token);
         //重新签发token
