@@ -14,37 +14,39 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class LoginUserUtil {
 
     public static String getUserId() {
-        try {
-            Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
-            if (ObjectUtil.isNull(credentials) || StrUtil.isBlank(credentials.toString())) {
-                return null;
-            }
-            User user = (User) credentials;
-            return user.getUserId();
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            return null;
-        }
+        User user = getUserManage();
+        if (user == null) return null;
+        return user.getUserId();
 
     }
 
     public static Integer getUserRegion() {
-        Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
-        if (ObjectUtil.isNull(credentials) || StrUtil.isBlank(credentials.toString())) {
-            return null;
-        }
-        User user = (User) credentials;
+        User user = getUserManage();
+        if (user == null) return null;
         return user.getRegionId();
     }
 
     public static String getUserName() {
-        Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
-        if (ObjectUtil.isNull(credentials) || StrUtil.isBlank(credentials.toString())) {
-            return null;
-        }
-        User user = (User) credentials;
+        User user = getUserManage();
+        if (user == null) return null;
         return user.getName();
 
+    }
+
+    private static User getUserManage() {
+        try {
+            if (SecurityContextHolder.getContext() == null || SecurityContextHolder.getContext().getAuthentication() == null) {
+                return null;
+            }
+            Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+            if (ObjectUtil.isNull(credentials) || StrUtil.isBlank(credentials.toString())) {
+                return null;
+            }
+            return (User) credentials;
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

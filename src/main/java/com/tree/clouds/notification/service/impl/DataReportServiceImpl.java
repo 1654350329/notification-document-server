@@ -201,7 +201,7 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, DataRep
         formulationLog.setTitle(date + "全市人社系统重点工作指标进度及成效评价一览表");
         formulationLog.setYear(year);
         formulationLog.setMonth(month);
-        List<DataInfoVO> dataInfoVOS = this.dataInfo(formulationLog.getYear(), formulationLog.getMonth());
+        List<DataInfoVO> dataInfoVOS = this.dataInfo(formulationLog.getYear(), formulationLog.getMonth(), null);
         formulationLog.setDataInfo(JSONUtil.toJsonStr(dataInfoVOS));
         formulationLogService.save(formulationLog);
     }
@@ -277,8 +277,8 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, DataRep
     }
 
     @Override
-    public List<DataInfoVO> dataInfo(int year, int month) {
-        List<DataInfoVO> dataInfoVOS = formulationDrawService.dataInfo(year);
+    public List<DataInfoVO> dataInfo(Integer year, Integer month, String drawId) {
+        List<DataInfoVO> dataInfoVOS = formulationDrawService.dataInfo(year, drawId);
         //各月份数据
         for (DataInfoVO dataInfoVO : dataInfoVOS) {
             //如果为数字类型
@@ -473,7 +473,7 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, DataRep
         String fileName = date + "全市人社系統重点工作指标进度及成效评价一览表.xlsx";
         Map<String, Object> head = new HashMap<>();
         head.put("data", date);
-        List<DataInfoVO> dataInfoVOS = dataInfo(year, month);
+        List<DataInfoVO> dataInfoVOS = dataInfo(year, month, null);
         List<Map<String, Object>> dates = new ArrayList<>();
 
         for (int i = 0; i < dataInfoVOS.size(); i++) {
@@ -510,7 +510,7 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, DataRep
 //        int[] k={1};
         ExcelWriter excelWriter = EasyExcel.write(Constants.TMP_HOME + fileName)
                 .withTemplate(in)
-                .registerWriteHandler(new ExcelMergeStrategy(2, list, 3))
+                .registerWriteHandler(new ExcelMergeStrategy(2, list, 1))
                 .build();
         WriteSheet writeSheet = EasyExcel.writerSheet().build();
         excelWriter.fill(dates, writeSheet);
@@ -562,5 +562,62 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, DataRep
         return this.getOne(new QueryWrapper<DataReport>().eq(FormulationDisassemble.DISASSEMBLE_ID, disassembleId)
                 .eq(FormulationDisassemble.REGION_ID, regionId));
 
+    }
+
+    @Override
+    public void exportLog(String drawId, Integer month, HttpServletResponse response) {
+        FormulationDraw draw = this.formulationDrawService.getById(drawId);
+        List<DataInfoVO> dataInfoVOS = dataInfo(null, month, drawId);
+        InputStream in = this.getClass().getResourceAsStream("/drawDetailFile.xlsx");
+        String date;
+        if (month > 1) {
+            date = draw.getDrawName() + draw.getYear() + "年 1月-" + month + "月";
+        } else {
+            date = draw.getDrawName() + draw.getYear() + "年 1月";
+        }
+        String fileName = date + "全市人社系統重点工作指标进度及成效评价一览表.xlsx";
+        List<Map<String, Object>> dates = new ArrayList<>();
+
+        DataInfoVO dataInfoVO = dataInfoVOS.get(0);
+        for (int i1 = 0; i1 < dataInfoVO.getRegionDataVOS().size(); i1++) {
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("index", i1 + 1);
+            data.put("drawName", dataInfoVO.getDrawName());
+            RegionDataVO dataVO = dataInfoVO.getRegionDataVOS().get(i1);
+            data.put("regionName", dataVO.getRegionName());
+            data.put("task", dataVO.getTask());
+            data.put("data", dataVO.getData());
+            data.put("dataSum", dataVO.getDataSum());
+            data.put("progress", dataVO.getProgress());
+            if (dataVO.getProgress() != null) {
+                String replace = dataVO.getProgress().replace("/", "").replace("%", "");
+                if (StrUtil.isBlank(replace)) {
+                    data.put("status", 0);
+                }
+                if (NumberUtil.isNumber(replace)) {
+                    data.put("status", Double.parseDouble(replace) > 100 ? "完成" : dataVO.getStatus() == 0 ? "滞后" : "序时");
+                } else {
+                    data.put("status", 0);
+                }
+            }
+            data.put("ranking", dataVO.getRanking());
+
+            dates.add(data);
+
+        }
+        List<Integer> list = new ArrayList<>();
+        list.add(1);
+//        int[] k={1};
+        ExcelWriter excelWriter = EasyExcel.write(Constants.TMP_HOME + fileName)
+                .withTemplate(in)
+                .registerWriteHandler(new ExcelMergeStrategy(1, list, 3))
+                .build();
+
+        WriteSheet writeSheet = EasyExcel.writerSheet().build();
+        excelWriter.fill(dates, writeSheet);
+        excelWriter.finish();
+
+        byte[] bytes = DownloadFile.File2byte(new File(Constants.TMP_HOME + fileName));
+        DownloadFile.downloadFile(bytes, fileName, response, false);
     }
 }

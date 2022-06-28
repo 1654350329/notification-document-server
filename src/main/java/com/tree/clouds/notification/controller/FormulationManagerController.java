@@ -51,8 +51,19 @@ public class FormulationManagerController {
             year = year - 1;
             month = 12;
         }
-        List<DataInfoVO> dataInfoVOS = dataReportService.dataInfo(year, month);
+        List<DataInfoVO> dataInfoVOS = dataReportService.dataInfo(year, month, null);
         return RestResponse.ok(dataInfoVOS);
+    }
+
+    @GetMapping("/exportLog/{drawId}/{month}")
+    @ApiOperation(value = "指定项目导出")
+    @Log("通报文件导出")
+//    @PreAuthorize("hasAuthority('formulation:manager:export')")
+    public void exportLog(@PathVariable String drawId, @PathVariable Integer month, HttpServletResponse response) {
+        if (month == 0) {
+            month = 1;
+        }
+        dataReportService.exportLog(drawId, month, response);
     }
 
     @GetMapping("/exportFormulationLog/{year}/{month}")

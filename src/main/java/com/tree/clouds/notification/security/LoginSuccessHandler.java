@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
@@ -58,7 +59,11 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 		ServletOutputStream outputStream = response.getOutputStream();
 
 		// 生成jwt，并放置到请求头中
-		String jwt = jwtUtils.generateToken(authentication.getName());
+		String key = UUID.randomUUID().toString();
+		String jwt = jwtUtils.generateToken(authentication.getName(), key);
+		redisUtil.hset(Constants.ACCOUNT_KEY, username, key, 60 * 10);
+
+		// 生成jwt，并放置到请求头中
 		response.setHeader(jwtUtils.getHeader(), jwt);
 		Map<String, Object> map = new HashMap<>();
 		map.put(jwtUtils.getHeader(), jwt);

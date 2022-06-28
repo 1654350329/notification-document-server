@@ -12,7 +12,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -20,6 +22,7 @@ import java.util.Objects;
  */
 
 public class ExcelMergeStrategy implements CellWriteHandler {
+    private Map<Integer, String> map = new HashMap<>();
     /**
      * 合并起始行
      */
@@ -74,18 +77,20 @@ public class ExcelMergeStrategy implements CellWriteHandler {
         //1.当前行>合并起始行，默认标题行(0)不参加合并
         //2.间隔行(eachRow)的上下两条不参加合并
         //2.1间隔行(eachRow)==0时，不设置间隔
+
         if (isMerge(curRowIndex)) {
             if (mergeColumnIndex.contains(curColIndex)) {
                 mergeWithPrevRow(writeSheetHolder, cellData, cell, curRowIndex, curColIndex);
             }
 
         }
-
+        if (mergeColumnIndex.contains(curColIndex)) {
+            map.put(writeSheetHolder.hashCode(), cellData.getStringValue());
+        }
     }
 
     @Override
     public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List cellDataList, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
-
     }
 
     /**
@@ -103,7 +108,7 @@ public class ExcelMergeStrategy implements CellWriteHandler {
      */
 
     private boolean isMerge(Integer curRowIndex) {
-        if ((curRowIndex > mergeRowIndex) && eachRow > 0) {
+        if (curRowIndex > mergeRowIndex) {
             return true;
         }
         return false;
@@ -121,7 +126,7 @@ public class ExcelMergeStrategy implements CellWriteHandler {
         }
 
         // 比较当前行的第一列的单元格与上一行是否相同，相同合并当前单元格与上一行
-        if (row == null || Objects.equals(curData, preData)) {
+        if (curData.equals(map.get(writeSheetHolder.hashCode())) || Objects.equals(curData, preData)) {
             Sheet sheet = writeSheetHolder.getSheet();
             List<CellRangeAddress> mergeRegions = sheet.getMergedRegions();
             boolean isMerged = false;

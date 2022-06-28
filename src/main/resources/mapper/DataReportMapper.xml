@@ -18,7 +18,7 @@
             and (c.project_name like "%"#{formulationDrawPageVO.drawName}"%" or a.draw_name like
             "%"#{formulationDrawPageVO.drawName}"%")
         </if>
-        order by c.project_name desc,c.create_time desc
+        order by c.sort asc
     </select>
 
     <select id="reportExaminePage" resultType="com.tree.clouds.notification.model.vo.ReportExamineVO">

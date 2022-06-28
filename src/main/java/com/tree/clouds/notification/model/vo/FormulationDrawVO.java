@@ -21,6 +21,9 @@ public class FormulationDrawVO {
     @NotBlank(message = "指标项目名称不许为空")
     @ApiModelProperty(value = "重点指标,重点项目")
     private String drawName;
+    //    @NotBlank(message = "排序")
+    @ApiModelProperty(value = "排序")
+    private Integer sort;
     //    @NotBlank(message = "责任领导不许为空")
     @ApiModelProperty(value = "责任领导")
     private String leader;

@@ -21,8 +21,9 @@ public interface FormulationDrawMapper extends BaseMapper<FormulationDraw> {
 
     IPage<FormulationDraw> drawPage(IPage<FormulationDraw> page, @Param("formulationDrawPageVO") FormulationDrawPageVO formulationDrawPageVO);
 
-    List<DataInfoVO> dataInfo(@Param("year") int year);
+    List<DataInfoVO> dataInfo(@Param("year") Integer year, @Param("drawId") String drawId);
 
     int distributionCount(@Param("drawId") String drawId);
 
+    List<FormulationDraw> getBySortAndYear(Integer startSort, Integer endSort, Integer year);
 }

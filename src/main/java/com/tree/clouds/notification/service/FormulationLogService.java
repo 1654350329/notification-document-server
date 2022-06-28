@@ -23,4 +23,6 @@ public interface FormulationLogService extends IService<FormulationLog> {
     FormulationLogVO formulationLogDetail(String logId);
 
     void exportFormulationLog(String id, HttpServletResponse response);
+
+    void exportLog(String logId, String drawId, HttpServletResponse response);
 }

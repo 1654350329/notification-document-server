@@ -60,6 +60,15 @@ public class FormulationDrawController {
         return RestResponse.ok(true);
     }
 
+    @PostMapping("/updateSort/{drawId}/{sort}")
+    @ApiOperation(value = "修改排序")
+    @Log("修改排序")
+    @PreAuthorize("hasAuthority('formulation:draw:update')")
+    public RestResponse<Boolean> updateSort(@PathVariable String drawId, @PathVariable Integer sort) {
+        formulationDrawService.updateSort(drawId, sort);
+        return RestResponse.ok(true);
+    }
+
     @GetMapping("/importDraw/{year}")
     @ApiOperation(value = "导出指标方案")
     @Log("导出指标方案")

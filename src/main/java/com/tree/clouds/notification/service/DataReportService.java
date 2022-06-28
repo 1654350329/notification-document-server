@@ -26,7 +26,7 @@ public interface DataReportService extends IService<DataReport> {
 
     void addReleaseExamine(Integer year, Integer month);
 
-    List<DataInfoVO> dataInfo(int year, int month);
+    List<DataInfoVO> dataInfo(Integer year, Integer month, String drawId);
 
     void exportFormulationLog(int year, int month, HttpServletResponse response);
 
@@ -35,4 +35,6 @@ public interface DataReportService extends IService<DataReport> {
     IPage<ReportExamineVO> reviewExaminePage(IPage<ReportExamineVO> page, ReportExaminePageVO reportExaminePageVO);
 
     DataReport getByDisassembleIdAndRegionId(String disassembleId, Integer regionId);
+
+    void exportLog(String drawId, Integer month, HttpServletResponse response);
 }

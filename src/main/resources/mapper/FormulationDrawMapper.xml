@@ -39,6 +39,7 @@
         <if test="formulationDrawPageVO.distributeStatus !=null">
             and distribute_status = #{formulationDrawPageVO.distributeStatus}
         </if>
+        order by sort asc
     </select>
     <select id="dataInfo" resultMap="DataInfoVOMap">
         select a.draw_id,a.project_name,a.draw_name,a.leader,b.disassemble_id,d.region_id,d.region_name
@@ -48,15 +49,24 @@
         LEFT JOIN data_report c on b.disassemble_id=c.disassemble_id
         LEFT JOIN region d on c.region_id=d.region_id
         <where>
-            a.status=1 and a.year =#{year}
+            a.status=1
+            <if test="year!=null">
+                and a.year =#{year}
+            </if>
+            <if test="drawId!=null">
+                and a.draw_id =#{drawId}
+            </if>
         </where>
-        order by a.project_name asc , d.region_id asc
+        order by a.sort asc , d.region_id asc
 
     </select>
     <select id="distributionCount" resultType="java.lang.Integer">
         select count(*) from  formulation_draw a
         left join formulation_disassemble b on a.draw_id=b.draw_id
         where b.status=1 and a.draw_Id=#{drawId}
+    </select>
+    <select id="getBySortAndYear" resultType="com.tree.clouds.notification.model.entity.FormulationDraw">
+        select * from formulation_draw where sort>=#{startSort} and sort &lt;=#{endSort}
     </select>
 
 </mapper>

@@ -30,7 +30,7 @@ public interface FormulationDrawService extends IService<FormulationDraw> {
 
     void copyDraw(Integer year);
 
-    List<DataInfoVO> dataInfo(int year);
+    List<DataInfoVO> dataInfo(Integer year, String drawId);
 
     void removeDraw(String id);
 
@@ -39,4 +39,6 @@ public interface FormulationDrawService extends IService<FormulationDraw> {
     FormulationDraw getByDisassembleId(String disassembleId);
 
     int distributionCount(String drawId);
+
+    void updateSort(String drawId, Integer sort);
 }

@@ -68,6 +68,34 @@ public class FormulationDrawServiceImpl extends ServiceImpl<FormulationDrawMappe
         return this.baseMapper.distributionCount(drawId);
     }
 
+    @Override
+    public void updateSort(String drawId, Integer startSort) {
+        FormulationDraw draw = this.getById(drawId);
+        if (Objects.equals(draw.getSort(), startSort)) {
+            return;
+        }
+        List<FormulationDraw> draws = new ArrayList<>();
+        if (draw.getSort() > startSort) {
+            draws = this.baseMapper.getBySortAndYear(startSort, draw.getSort(), draw.getYear());
+        }
+        if (draw.getSort() < startSort) {
+            draws = this.baseMapper.getBySortAndYear(draw.getSort(), startSort, draw.getYear());
+        }
+        for (FormulationDraw formulationDraw : draws) {
+            if (formulationDraw.getDrawId().equals(drawId)) {
+                formulationDraw.setSort(startSort);
+                continue;
+            }
+            if (draw.getSort() > startSort) {
+                formulationDraw.setSort(formulationDraw.getSort() + 1);
+            }
+            if (draw.getSort() < startSort) {
+                formulationDraw.setSort(formulationDraw.getSort() - 1);
+            }
+        }
+        this.updateBatchById(draws);
+    }
+
     /**
      * 判断本年度是否已发布项目
      */
@@ -86,10 +114,14 @@ public class FormulationDrawServiceImpl extends ServiceImpl<FormulationDrawMappe
     public void addDraw(FormulationDrawVO formulationDrawVO) {
         //判断本年度是否已发布项目
 //        check();
+        FormulationDraw one = this.getOne(new QueryWrapper<FormulationDraw>().eq(FormulationDraw.YEAR, DateUtil.year(new Date()))
+                .orderByDesc(FormulationDraw.SORT)
+                .last("limit 1"));
         FormulationDraw formulationDraw = BeanUtil.toBean(formulationDrawVO, FormulationDraw.class);
         formulationDraw.setYear(DateUtil.year(new Date()));
         formulationDraw.setDistributeStatus(0);
         formulationDraw.setStatus(0);
+        formulationDraw.setSort(one == null ? 1 : one.getSort() + 1);
         this.save(formulationDraw);
         monthInfoService.addByBizId(formulationDrawVO.getMonthInfoVOS(), formulationDraw.getDrawId());
         disassembleService.initDisassemble(formulationDraw.getDrawId());
@@ -173,8 +205,8 @@ public class FormulationDrawServiceImpl extends ServiceImpl<FormulationDrawMappe
     }
 
     @Override
-    public List<DataInfoVO> dataInfo(int year) {
-        return this.baseMapper.dataInfo(year);
+    public List<DataInfoVO> dataInfo(Integer year, String drawId) {
+        return this.baseMapper.dataInfo(year, drawId);
     }
 
     @Override

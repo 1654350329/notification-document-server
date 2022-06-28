@@ -30,6 +30,7 @@ public class FormulationDraw extends BaseEntity {
     public static final String LEADER = "leader";
     public static final String TASK = "task";
     public static final String YEAR = "year";
+    public static final String SORT = "sort";
     public static final String STATUS = "status";
     @ApiModelProperty(value = "各月份信息")
     @TableField(exist = false)
@@ -46,6 +47,8 @@ public class FormulationDraw extends BaseEntity {
     @ApiModelProperty(value = "责任领导")
     @TableField("leader")
     private String leader;
+    @TableField("sort")
+    private Integer sort;
     @ApiModelProperty(value = "全年任务")
     @TableField("task")
     private String task;

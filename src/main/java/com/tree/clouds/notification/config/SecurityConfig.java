@@ -30,10 +30,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/v2/api-docs/**",
             "/test/**",
             "/formulation-manager/exportFormulationLog/**",
+            "/formulation-manager/exportLog/**",
             "/formulation-draw/importDraw/**",
             "/disassemble/exportData/**",
             "/formulation-log/exportFormulationLog/**",
-            "/data-report/exportDataReport/**"
+            "/data-report/exportDataReport/**",
+            "/formulation-log/exportLog/**"
     };
     @Autowired
     LoginFailureHandler loginFailureHandler;

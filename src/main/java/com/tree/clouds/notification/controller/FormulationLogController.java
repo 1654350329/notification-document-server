@@ -58,5 +58,12 @@ public class FormulationLogController {
         formulationLogService.exportFormulationLog(publicIdReqVO.getId(), response);
     }
 
+    @GetMapping("/exportLog/{logId}/{drawId}")
+    @ApiOperation(value = "导出指定日志")
+    @Log("通报日志导出")
+//    @PreAuthorize("hasAuthority('formulation:log:export')")
+    public void exportLog(@PathVariable String logId, @PathVariable String drawId, HttpServletResponse response) {
+        formulationLogService.exportLog(logId, drawId, response);
+    }
 }
 

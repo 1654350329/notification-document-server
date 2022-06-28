@@ -28,12 +28,12 @@ spring:
     time-zone: GMT+8
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    #    url: jdbc:mysql://localhost:3306/notification?useSSL=true&useSSL=true&useUnicode=true&characterEncoding=UTF-8
-    url: jdbc:mysql://localhost:3306/notification_document?useSSL=true&useSSL=true&useUnicode=true&characterEncoding=UTF-8
-    username: root
-    password: 123456
-#    username: notification
-#    password: root
+    url: jdbc:mysql://localhost:3306/notification?useSSL=true&useSSL=true&useUnicode=true&characterEncoding=UTF-8
+    #    url: jdbc:mysql://localhost:3306/notification_document?useSSL=true&useSSL=true&useUnicode=true&characterEncoding=UTF-8
+    #    username: root
+    #    password: 123456
+    username: notification
+    password: root
 # mybatis-plus 配置
 mybatis-plus:
   configuration:

@@ -28,7 +28,7 @@
         <if test="formulationDrawPageVO.drawName !=null and formulationDrawPageVO.drawName !=''">
             and b.draw_name like "%"#{formulationDrawPageVO.drawName}"%"
         </if>
-
+        order by b.sort asc
     </select>
     <select id="detailDisassemble"
             resultType="com.tree.clouds.notification.model.entity.FormulationDisassemble">
