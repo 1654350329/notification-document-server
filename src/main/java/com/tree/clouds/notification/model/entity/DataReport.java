@@ -88,4 +88,9 @@ public class DataReport extends BaseEntity {
     @ExcelIgnore
     private Integer numberType;
 
+    @ApiModelProperty(value = "地区名称")
+    @TableField(exist = false)
+    @ExcelIgnore
+    private String regionName;
+
 }

@@ -85,6 +85,13 @@ public class MonthInfoServiceImpl extends ServiceImpl<MonthInfoMapper, MonthInfo
     }
 
     @Override
+    public void deleteByBizId(List<String> bizIds) {
+        QueryWrapper<MonthInfo> wrapper = new QueryWrapper<>();
+        wrapper.in(MonthInfo.BIZ_ID, bizIds);
+        this.remove(wrapper);
+    }
+
+    @Override
     public void copyData(String oldBizId, String newBizId) {
         List<MonthInfoVO> infoVOS = getByBizId(oldBizId);
         addByBizId(infoVOS, newBizId);

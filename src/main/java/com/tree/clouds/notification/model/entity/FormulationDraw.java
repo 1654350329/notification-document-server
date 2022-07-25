@@ -1,9 +1,6 @@
 package com.tree.clouds.notification.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.tree.clouds.notification.model.vo.MonthInfoVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -65,7 +62,7 @@ public class FormulationDraw extends BaseEntity {
     @TableField("number_type")
     private Integer numberType;
     @ApiModelProperty(value = "计算类型 < ,<=, =, >,>=")
-    @TableField("calculation_type")
+    @TableField(value = "calculation_type", updateStrategy = FieldStrategy.IGNORED)
     private String calculationType;
     @ApiModelProperty(value = "已分配单位")
     @TableField(exist = false)

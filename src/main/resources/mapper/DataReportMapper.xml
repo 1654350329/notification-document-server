@@ -7,9 +7,10 @@
         report_id, formulation_id, task, progress, examine_status, create_user, create_time, update_user, update_time, del
     </sql>
     <select id="dataReportPage" resultType="com.tree.clouds.notification.model.entity.DataReport">
-        SELECT a.*, c.project_name,c.number_type,c.calculation_type from data_report a
+        SELECT a.*, c.project_name,c.number_type,c.calculation_type,d.region_name from data_report a
         left join formulation_disassemble b on b.disassemble_id=a.disassemble_id
         left join formulation_draw c on b.draw_id=c.draw_id
+        left join region d on a.region_id=d.region_id
         where a.region_id=#{regionId}
         <if test="formulationDrawPageVO.year !=null and formulationDrawPageVO.year !=0">
             and a.year=#{formulationDrawPageVO.year}
@@ -26,12 +27,13 @@
         LEFT JOIN month_info b on a.report_id=b.biz_Id
         left join region c on a.region_id=c.region_id
         where a.region_id=#{regionId} and b.examine_status>0
+        and b.status = 2
         <if test="reportExaminePageVO.examineStatus !=null and reportExaminePageVO.examineStatus  lte 6">
             and b.examine_status = #{reportExaminePageVO.examineStatus}
         </if>
-        <if test="reportExaminePageVO.status !=null">
-            and b.status = #{reportExaminePageVO.status}
-        </if>
+        <!--        <if test="reportExaminePageVO.status !=null">-->
+        <!--            and b.status = #{reportExaminePageVO.status}-->
+        <!--        </if>-->
 
         <if test="reportExaminePageVO.drawName !=null and reportExaminePageVO.drawName !=''">
             and a.draw_name like "%"#{reportExaminePageVO.drawName}"%"

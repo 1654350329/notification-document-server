@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -70,6 +71,7 @@ public class FormulationDrawServiceImpl extends ServiceImpl<FormulationDrawMappe
 
     @Override
     public void updateSort(String drawId, Integer startSort) {
+
         FormulationDraw draw = this.getById(drawId);
         if (Objects.equals(draw.getSort(), startSort)) {
             return;
@@ -134,6 +136,9 @@ public class FormulationDrawServiceImpl extends ServiceImpl<FormulationDrawMappe
             throw new BaseBusinessException(400, "已发布不可修改!!");
         }
         FormulationDraw formulationDraw = BeanUtil.toBean(formulationDrawVO, FormulationDraw.class);
+        if (formulationDraw.getNumberType() == 0) {
+            formulationDraw.setCalculationType(null);
+        }
         this.updateById(formulationDraw);
         monthInfoService.updateByBizId(formulationDrawVO.getMonthInfoVOS(), formulationDrawVO.getDrawId());
     }
@@ -183,8 +188,17 @@ public class FormulationDrawServiceImpl extends ServiceImpl<FormulationDrawMappe
         if (year == 0) {
             year = DateUtil.year(new Date()) - 1;
         }
+        //删除当前年数据
         QueryWrapper<FormulationDraw> formulationDrawQueryWrapper = new QueryWrapper<>();
+        formulationDrawQueryWrapper.eq(FormulationDraw.YEAR, DateUtil.year(new Date()));
+        List<FormulationDraw> drawList = this.list(formulationDrawQueryWrapper);
+        for (FormulationDraw draw : drawList) {
+            removeDraw(draw.getDrawId());
+        }
+        //查找指定年数据
+        formulationDrawQueryWrapper = new QueryWrapper<>();
         formulationDrawQueryWrapper.eq(FormulationDraw.YEAR, year);
+
         List<FormulationDraw> list = this.list(formulationDrawQueryWrapper);
         //复制基础数据
         list.forEach(formulationDraw -> {
@@ -194,14 +208,25 @@ public class FormulationDrawServiceImpl extends ServiceImpl<FormulationDrawMappe
             }
             formulationDraw.setYear(DateUtil.year(new Date()));
             formulationDraw.setDrawId(null);
+            formulationDraw.setStatus(0);
             formulationDraw.setCreateTime(null);
             formulationDraw.setUpdateTime(null);
             formulationDraw.setCreateUser(null);
             formulationDraw.setUpdateUser(null);
             this.save(formulationDraw);
             this.monthInfoService.copyData(oldDrawID, formulationDraw.getDrawId());
-        });
+            //复制各地区数据
+            List<FormulationDisassemble> disassembleList = disassembleService.getByDrawId(oldDrawID);
+            for (FormulationDisassemble formulationDisassemble : disassembleList) {
+                String oldId = formulationDisassemble.getDisassembleId();
+                formulationDisassemble.setDisassembleId(null);
+                formulationDisassemble.setDrawId(formulationDraw.getDrawId());
+                formulationDisassemble.setReleaseStatus(0);
+                this.formulationDisassembleService.save(formulationDisassemble);
+                this.monthInfoService.copyData(oldId, formulationDisassemble.getDisassembleId());
+            }
 
+        });
     }
 
     @Override
@@ -217,7 +242,10 @@ public class FormulationDrawServiceImpl extends ServiceImpl<FormulationDrawMappe
         }
         this.removeById(id);
         monthInfoService.deleteByBizId(id);
-        disassembleService.remove(new QueryWrapper<FormulationDisassemble>().eq(FormulationDisassemble.DRAW_ID, id));
+        List<FormulationDisassemble> disassembles = disassembleService.getByDrawId(id);
+        List<String> collect = disassembles.stream().map(FormulationDisassemble::getDisassembleId).collect(Collectors.toList());
+        disassembleService.removeByIds(collect);
+        monthInfoService.deleteByBizId(collect);
     }
 
     @Override

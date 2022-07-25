@@ -59,9 +59,15 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         this.roleMenuMapper.delete(new QueryWrapper<RoleMenu>().eq(RoleMenu.ROLE_ID, distributeRoleVO.getRoleId()));
         List<String> menuIds = distributeRoleVO.getMenuIds();
         Set<String> menuSet = new HashSet<>(menuIds);
-
+        if (CollUtil.isEmpty(menuIds)) {
+            throw new BaseBusinessException(400, "至少为用户分配一个权限");
+        }
         for (String menuId : menuIds) {
             SysMenu sysMenu = this.sysMenuService.getById(menuId);
+            if (sysMenu == null) {
+                menuSet.remove(menuId);
+                continue;
+            }
             String pid = sysMenu.getParentId();
             while (!pid.equals("0")) {
                 menuSet.add(pid);

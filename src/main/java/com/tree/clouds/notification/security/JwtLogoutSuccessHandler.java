@@ -5,6 +5,7 @@ import com.tree.clouds.notification.common.RestResponse;
 import com.tree.clouds.notification.service.LoginLogService;
 import com.tree.clouds.notification.utils.JwtUtils;
 import com.tree.clouds.notification.utils.LoginUserUtil;
+import com.tree.clouds.notification.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -21,18 +22,26 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class JwtLogoutSuccessHandler implements LogoutSuccessHandler {
 
-	@Autowired
-	private JwtUtils jwtUtils;
-	@Autowired
-	private LoginLogService loginLogService;
+    @Autowired
+    private JwtUtils jwtUtils;
+    @Autowired
+    private LoginLogService loginLogService;
+    @Autowired
+    private RedisUtil redisUtil;
 
-	@Override
-	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
-		if (authentication != null) {
+    @Override
+    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        loginLogService.updateLongTime(LoginUserUtil.getUserId());
+        if (LoginUserUtil.getUserId() != null) {
+            redisUtil.del("GrantedAuthority:" + LoginUserUtil.getUserId());
+        }
+        System.out.println("LoginUserUtil.getUserId() = " + LoginUserUtil.getUserId());
+        if (authentication != null) {
             new SecurityContextLogoutHandler().logout(request, response, authentication);
         }
-        loginLogService.updateLongTime(LoginUserUtil.getUserId());
+
+
         response.setContentType("application/json;charset=UTF-8");
         ServletOutputStream outputStream = response.getOutputStream();
 

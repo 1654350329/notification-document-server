@@ -33,4 +33,6 @@ public interface FormulationDisassembleService extends IService<FormulationDisas
     void exportData(Integer year, Integer regionId, HttpServletResponse response);
 
     void rebuildDisassemble(String disassembleId);
+
+    List<FormulationDisassemble> getByDrawId(String drawId);
 }

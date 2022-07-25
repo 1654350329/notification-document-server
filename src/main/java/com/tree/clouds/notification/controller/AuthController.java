@@ -69,18 +69,19 @@ public class AuthController {
 
     @GetMapping("/info")
     @ApiOperation(value = "获取用户信息")
-    private RestResponse<Map> getInfo() {
+    private RestResponse<Map<String, Object>> getInfo() {
         //roles, name, avatar, introduction
         User user = userManageService.getById(LoginUserUtil.getUserId());
         String userAuthorityInfo = userManageService.getUserAuthorityInfo(user.getUserId());
         List<String> roles = Arrays.stream(userAuthorityInfo.split(",")).collect(Collectors.toList());
+        String regionName = regionService.getById(LoginUserUtil.getUserRegion()).getRegionName();
         Map<String, Object> map = new HashMap<>();
         map.put("roles", roles);
-        map.put("admin", roles.contains("sup_admin"));
+        map.put("admin", (roles.contains("sup_admin") || regionName.equals("市本级")));
         map.put("name", user.getName());
-        map.put("regionName", regionService.getById(LoginUserUtil.getUserRegion()).getRegionName());
+        map.put("regionName", regionName);
         map.put("regionId", LoginUserUtil.getUserRegion());
-
+        map.put("passwordStatus", bCryptPasswordEncoder.matches("888888", user.getPassword()));
         return RestResponse.ok(map);
     }
 

@@ -49,9 +49,15 @@ public class ReportExamineServiceImpl extends ServiceImpl<ReportExamineMapper, R
     @Override
     @Transactional
     public void addReportExamine(AddReportExamineVO addReportExamineVO, int progress) {
+        if (addReportExamineVO.getRemark() != null && addReportExamineVO.getRemark().length() > 300) {
+            throw new BaseBusinessException(400, "审核意见不许超过300字符!");
+        }
         MonthInfo info = monthInfoService.getById(addReportExamineVO.getMonthId());
-        if (info.getExamineStatus() == 3 && info.getStatus() == 1) {
+        if (info.getExamineStatus() >= 3 && info.getStatus() == 1) {
             return;
+        }
+        if (progress == 3 && info.getStatus() != null && info.getStatus() == 2) {
+            throw new BaseBusinessException(400, "数据处于驳回状态,无法通过");
         }
         if (info.getUpdateTime() != null && !info.getUpdateTime().equals(addReportExamineVO.getUpdateTime())) {
             throw new BaseBusinessException(400, "数据不是最新,请重新刷新数据");

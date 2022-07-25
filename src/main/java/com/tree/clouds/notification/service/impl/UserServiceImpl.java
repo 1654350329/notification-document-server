@@ -166,6 +166,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //角色先删后增
         userRoleService.removeRole(userManage.getUserId());
         userRoleService.addRole(userManageBO.getRoleIds(), userManage.getUserId());
+        redisUtil.del("GrantedAuthority:" + userManage.getUserId());
     }
 
     @Override

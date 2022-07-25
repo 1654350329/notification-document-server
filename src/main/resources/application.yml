@@ -20,7 +20,7 @@ spring:
     host: 127.0.0.1
     #    password:
     port: 6379
-    database: 7
+    database: 6
   cache:
     type: redis  #ehcache
   jackson:
@@ -46,4 +46,4 @@ markerhub:
   jwt:
     header: Authorization
     expire: 1800 #30分钟，秒单位
-    secret: ji8n3439n439n43ld9ne9343fdfer49h
+    secret: ji8n3439n439n43ld9ne9343fdfer49hji8n3439n439n43ld9ne9343fdfer49hji8n3439n439n43ld9ne9343fdfer49h

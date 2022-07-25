@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -66,7 +67,6 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, DataRep
         regionId = regionId == null ? LoginUserUtil.getUserRegion() : regionId;
         IPage<DataReport> dataReportIPage = this.baseMapper.dataReportPage(page, drawPageVO, regionId);
         dataReportIPage.getRecords().forEach(record -> {
-
             FormulationDraw draw = this.formulationDrawService.getByDisassembleId(record.getDisassembleId());
             record.setNumberType(draw.getNumberType());
             List<MonthInfoVO> monthInfoVOS = monthInfoService.getByBizId(record.getReportId());
@@ -138,6 +138,15 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, DataRep
                 if (!NumberUtil.isNumber(monthInfoVO.getData())) {
                     throw new BaseBusinessException(400, "只允许填写数值型");
                 }
+                try {
+                    //四舍五入
+                    double parseDouble = Double.parseDouble(monthInfoVO.getData());
+                    BigDecimal round = NumberUtil.round(parseDouble, 2);
+                    monthInfoVO.setData(round.toString());
+                } catch (RuntimeException e) {
+                    throw new BaseBusinessException(400, "最大数字为 9223372036854775807");
+                }
+
             }
             if (monthInfoVO.getExamineStatus() > 2) {
                 throw new BaseBusinessException(400, "已提交审核,不许修改!");
@@ -145,7 +154,7 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, DataRep
 //            if (monthInfoVO.getMonth() > DateUtil.month(new Date()) + 1 && monthInfoVO.getData() != null) {
 //                throw new BaseBusinessException(400, "不许提交未到期数据!");
 //            }
-            monthInfoVO.setExamineStatus(1);
+            monthInfoVO.setExamineStatus(2);
         }
         dataReport.setRegionId(LoginUserUtil.getUserRegion());
         this.updateById(dataReport);

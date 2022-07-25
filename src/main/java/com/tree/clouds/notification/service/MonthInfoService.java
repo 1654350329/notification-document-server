@@ -26,6 +26,8 @@ public interface MonthInfoService extends IService<MonthInfo> {
 
     void deleteByBizId(String bizId);
 
+    void deleteByBizId(List<String> bizIds);
+
     void copyData(String oldBizId, String newBizId);
 
     String getDataByMonth(String bizId, int month);

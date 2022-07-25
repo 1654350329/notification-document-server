@@ -1,9 +1,6 @@
 package com.tree.clouds.notification.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.tree.clouds.notification.model.vo.MonthInfoVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -55,6 +52,6 @@ public class FormulationDisassemble extends BaseEntity {
     @TableField("release_status")
     private int releaseStatus;
     @ApiModelProperty(value = "全年任务")
-    @TableField("task")
+    @TableField(value = "task", updateStrategy = FieldStrategy.IGNORED)
     private String task;
 }

@@ -92,30 +92,30 @@ public class FormulationDisassembleServiceImpl extends ServiceImpl<FormulationDi
             }
             //数值型判断是否单个大于全年任务
             if (draw.getNumberType() == 0) {
-                long taskCount = formulationDisassembles.stream().mapToInt(formulationDisassemble -> Integer.parseInt(formulationDisassemble.getTask())).sum();
-                if (Integer.parseInt(disassemble.getTask()) > Integer.parseInt(draw.getTask())) {
+                double taskCount = formulationDisassembles.stream().mapToDouble(formulationDisassemble -> Double.parseDouble(formulationDisassemble.getTask())).sum();
+                if (Double.parseDouble(disassemble.getTask()) > Double.parseDouble(draw.getTask())) {
                     throw new BaseBusinessException(400, "考核单位:" + region.getRegionName() + "数据超出全市任务目标，请重新编辑！");
                 }
                 QueryWrapper<FormulationDisassemble> wrapper = new QueryWrapper<>();
                 wrapper.eq(FormulationDisassemble.DRAW_ID, draw.getDrawId());
                 List<FormulationDisassemble> list = this.list(wrapper);
-                long count = list.stream().filter(formulationDisassemble -> !disassembleIds.contains(formulationDisassemble.getDisassembleId())).mapToLong(formulationDisassemble -> {
+                Double count = list.stream().filter(formulationDisassemble -> !disassembleIds.contains(formulationDisassemble.getDisassembleId())).mapToDouble(formulationDisassemble -> {
                     if (formulationDisassemble.getTask() == null) {
                         return 0;
                     }
-                    return Integer.parseInt(formulationDisassemble.getTask());
+                    return Double.parseDouble(formulationDisassemble.getTask());
                 }).sum();
 
-                if (Long.parseLong(draw.getTask()) < taskCount + count && formulationDisassembles.size() == 1) {
+                if (Double.parseDouble(draw.getTask()) < taskCount + count && formulationDisassembles.size() == 1) {
                     throw new BaseBusinessException(400, "考核单位:" + region.getRegionName() + "保存本次数据将超出全市任务目标，请重新编辑！");
                 }
-                if (Long.parseLong(draw.getTask()) < taskCount + count && formulationDisassembles.size() > 1) {
+                if (Double.parseDouble(draw.getTask()) < taskCount + count && formulationDisassembles.size() > 1) {
                     throw new BaseBusinessException(400, "保存本次数据将超出全市任务目标，请重新编辑！");
                 }
-                long dataCount = disassemble.getMonthInfoVOS().stream().filter(monthInfoVO -> monthInfoVO.getMonth() == 12).mapToInt(monthInfoVO ->
-                        Integer.parseInt(monthInfoVO.getData())
+                double dataCount = disassemble.getMonthInfoVOS().stream().filter(monthInfoVO -> monthInfoVO.getMonth() == 12).mapToDouble(monthInfoVO ->
+                        Double.parseDouble(monthInfoVO.getData())
                 ).sum();
-                if (Long.parseLong(disassemble.getTask()) != dataCount) {
+                if (Double.parseDouble(disassemble.getTask()) != dataCount) {
                     throw new BaseBusinessException(400, "考核单位:" + region.getRegionName() + "各月份数据不等于全年任务，请重新编辑！");
                 }
             }
@@ -250,6 +250,12 @@ public class FormulationDisassembleServiceImpl extends ServiceImpl<FormulationDi
         disassemble.setStatus(0);
         this.updateById(disassemble);
         getCompleteStatus(disassemble.getDrawId());
+    }
+
+    @Override
+    public List<FormulationDisassemble> getByDrawId(String drawId) {
+
+        return this.list(new QueryWrapper<FormulationDisassemble>().eq(FormulationDisassemble.DRAW_ID, drawId));
     }
 
 }

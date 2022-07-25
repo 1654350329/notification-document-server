@@ -55,7 +55,7 @@ public class FormulationDisassembleController {
     @PostMapping("/detailDisassemble")
     @ApiOperation(value = "分配指标拆解信息查询 drawId")
     @Log("分配指标拆解信息查询")
-    @PreAuthorize("hasAuthority('formulation:disassemble:list')")
+//    @PreAuthorize("hasAuthority('formulation:disassemble:list')")
     public RestResponse<List<FormulationDisassemble>> detailDisassemble(@RequestBody PublicIdReqVO publicIdReqVO) {
         List<FormulationDisassemble> list = disassembleService.detailDisassemble(publicIdReqVO.getId());
         return RestResponse.ok(list);

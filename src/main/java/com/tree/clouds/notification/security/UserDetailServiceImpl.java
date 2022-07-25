@@ -29,7 +29,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
         User userManage = userService.getUserByAccount(username);
         if (userManage == null) {
-            throw new BaseBusinessException(400, "账号不存在");
+            throw new BaseBusinessException(400, "账号或密码错误");
         }
         if (userManage.getStatus() == 0) {
             throw new BaseBusinessException(400, "账号已停用");
