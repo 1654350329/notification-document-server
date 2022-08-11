@@ -8,7 +8,6 @@ import com.tree.clouds.notification.utils.BaseBusinessException;
 import com.tree.clouds.notification.utils.JwtUtils;
 import com.tree.clouds.notification.utils.RedisUtil;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
@@ -52,10 +51,12 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
         Claims claim = jwtUtils.getClaimByToken(jwt);
         if (claim == null) {
-            throw new JwtException("token 异常");
+            jwtAuthenticationEntryPoint.commence(request, response, new InsufficientAuthenticationException("token异常", new BaseBusinessException(402, "")));
+            return;
         }
         if (jwtUtils.isTokenExpired(claim)) {
-            throw new JwtException("token已过期");
+            jwtAuthenticationEntryPoint.commence(request, response, new InsufficientAuthenticationException("token过期", new BaseBusinessException(402, "")));
+            return;
         }
 
         String account = claim.getSubject();

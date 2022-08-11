@@ -33,6 +33,10 @@ public class RestResponse<T> implements Serializable {
         return new RestResponse<E>(HttpStatus.OK.value(), "ok", data);
     }
 
+    public static <E> RestResponse<E> ok(Integer code, E data) {
+        return new RestResponse<E>(code, "ok", data);
+    }
+
     public static <E> RestResponse<E> ok(E data, String message) {
         return new RestResponse<E>(HttpStatus.OK.value(), message, data);
     }

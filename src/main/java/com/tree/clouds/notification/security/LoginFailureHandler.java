@@ -40,15 +40,17 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
         loginLog.setStatus(2);
         loginLogService.save(loginLog);
         //连续输入5次锁定账号
-        Integer errorNumber = (Integer) redisUtil.hget(Constants.ERROR_LOGIN, username);
-        if (errorNumber != null) {
-            if (errorNumber < 5) {
-                redisUtil.hset(Constants.ERROR_LOGIN, username, errorNumber + 1, 60 * 10);
+        if (username != null) {
+            Integer errorNumber = (Integer) redisUtil.hget(Constants.ERROR_LOGIN, username);
+            if (errorNumber != null) {
+                if (errorNumber < 5) {
+                    redisUtil.hset(Constants.ERROR_LOGIN, username, errorNumber + 1, 60 * 10);
+                } else {
+                    redisUtil.hset(Constants.LOCK_ACCOUNT, username, DateUtil.now(), 60 * 10);
+                }
             } else {
-                redisUtil.hset(Constants.LOCK_ACCOUNT, username, DateUtil.now(), 60 * 10);
+                redisUtil.hset(Constants.ERROR_LOGIN, username, 1, 60 * 10);
             }
-        } else {
-            redisUtil.hset(Constants.ERROR_LOGIN, username, 1, 60 * 10);
         }
 
 

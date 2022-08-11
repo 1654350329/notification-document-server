@@ -33,7 +33,7 @@ spring:
     #    username: root
     #    password: 123456
     username: notification
-    password: root
+    password: ipDNjaaP6ZWNE2GW1.
 # mybatis-plus 配置
 mybatis-plus:
   configuration:
